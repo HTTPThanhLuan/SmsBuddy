@@ -147,5 +147,7 @@ namespace SmsBuddy
             _timer.Interval = TimeSpan.FromMinutes(1);
             _timer.Start();
         }
+
+        
     }
 }

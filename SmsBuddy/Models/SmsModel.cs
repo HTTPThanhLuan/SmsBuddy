@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Windows.Data;
 using LiteDB;
 using NullVoidCreations.WpfHelpers.Base;
 using NullVoidCreations.WpfHelpers.DataStructures;
@@ -123,6 +124,25 @@ namespace SmsBuddy.Models
             var db = Shared.Instance.Database;
             var collection = db.GetCollection<SmsModel>();
             return collection.Delete(Id);
+        }
+        public bool DeleteAll()
+        {
+            var db = Shared.Instance.Database;
+            var collection = db.GetCollection<SmsModel>();
+            IEnumerable<SmsModel> datas = collection.FindAll();
+            bool isDelete = true;
+
+            foreach(var data in datas)
+            {
+                if(data.Id != Id)
+                {
+                    isDelete = collection.Delete(data.Id);
+                    if (!isDelete)
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         public IEnumerable<IModel> Get()

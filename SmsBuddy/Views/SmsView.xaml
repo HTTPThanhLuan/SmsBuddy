@@ -8,10 +8,15 @@
     xmlns:vm="clr-namespace:SmsBuddy.ViewModels"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    xmlns:converter="clr-namespace:SmsBuddy.CustomConverter">
     <UserControl.DataContext>
         <vm:SmsViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <converter:SingleConverter x:Key="SingleConverter"/>
+        <converter:MultiConverter x:Key="MultiConverter"/>
+    </UserControl.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding RefreshCommand, Mode=OneTime}" />
@@ -36,6 +41,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -46,14 +52,15 @@
         </Grid.ColumnDefinitions>
 
         <Label Content="Mobile Numbers:" />
-        <ListBox Grid.Column="1" ItemsSource="{Binding Sms.MobileNumbers, Mode=OneWay}">
+        <ListBox Grid.Column="1" ItemsSource="{Binding Sms.MobileNumbers, Mode=TwoWay}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Button Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=DataContext.RemoveMobileNumberCommand, Mode=OneTime}">
                         <Button.CommandParameter>
                             <MultiBinding Converter="{StaticResource MultiValueConverter}">
                                 <Binding />
-                                <Binding Path="DataContext.Sms.MobileNumbers" RelativeSource="{RelativeSource AncestorType=UserControl, Mode=FindAncestor}" />
+                                <Binding Path="DataContext.Sms.MobileNumbers" 
+                                         RelativeSource="{RelativeSource AncestorType=UserControl, Mode=FindAncestor}" />
                             </MultiBinding>
                         </Button.CommandParameter>
                         <StackPanel Orientation="Horizontal">
@@ -76,7 +83,7 @@
             Grid.Column="2"
             Width="220"
             ItemsSource="{Binding Contacts, Mode=OneWay}"
-            SelectedValue="{Binding SelectedContact, Mode=TwoWay}" />
+            SelectedValue="{Binding SelectedContact, Mode=TwoWay}"/>
         <Button Grid.Column="3" Command="{Binding AddMobileNumberCommand, Mode=OneTime}">
             <Button.CommandParameter>
                 <MultiBinding Converter="{StaticResource MultiValueConverter}">
@@ -138,7 +145,6 @@
             Grid.Column="1"
             Grid.ColumnSpan="3"
             Text="{Binding Sms.Message.Length, Mode=OneWay, StringFormat='Message is {0} characters long.', FallbackValue='Message is 0 characters long.'}" />
-
         <Label Grid.Row="6" Content="Schedule:" />
         <StackPanel
             Grid.Row="6"
@@ -218,8 +224,29 @@
                 Height="16"
                 Source="pack://application:,,,/Assets/Images/plus-32.png" />
         </Button>
-
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4">
+        <Label Grid.Row="8" Content="Import from file: "/>
+        <StackPanel Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" >
+            <Button  Width="130" HorizontalAlignment="Left" 
+                Command="{Binding ImportFileCommand, Mode=OneTime}">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource MultiValueConverter}">
+                        <Binding Path="Sms.Template" />
+                        <Binding Path="Sms.Message" />
+                    </MultiBinding>
+                </Button.CommandParameter>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://application:,,,/Assets/Images/import-32.png" />
+                    <TextBlock Text="Import from Excel" />
+                </StackPanel>
+            </Button>
+            <Label Name="lblFileName">
+                <Label.Content>
+                    <Binding Converter="{StaticResource SingleConverter}" 
+                             UpdateSourceTrigger="PropertyChanged" Path="FileImport"/>
+                </Label.Content>
+            </Label>
+        </StackPanel>
+        <StackPanel Grid.Row="9" Grid.ColumnSpan="4">
             <StackPanel.Resources>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
@@ -255,15 +282,22 @@
                     <TextBlock Text="Refresh" />
                 </StackPanel>
             </Button>
+            <Button Command="{Binding ClearMessageCommand, Mode=OneTime}">
+                <StackPanel>
+                    <Image Source="pack://application:,,,/Assets/Images/clear-32.png" />
+                    <TextBlock Text="Clear message" />
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <DataGrid
-            Grid.Row="9"
+            Grid.Row="10"
             Grid.ColumnSpan="4"
             ItemsSource="{Binding Messages, Mode=OneWay}"
             SelectedValue="{Binding Sms, Mode=TwoWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding MobileNumbers.String}" Header="Mobile Numbers" />
+                <DataGridTextColumn Binding="{Binding MobileNumbers.String}" Header="Mobile Numbers">
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Template}" Header="Template" />
                 <DataGridTextColumn
                     Width="*"
