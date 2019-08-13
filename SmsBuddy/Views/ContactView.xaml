@@ -8,10 +8,14 @@
     xmlns:vm="clr-namespace:SmsBuddy.ViewModels"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    xmlns:converter="clr-namespace:SmsBuddy.CustomConverter">
     <UserControl.DataContext>
         <vm:ContactViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <converter:SingleConverter x:Key="SingleConverter"/>
+    </UserControl.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding RefreshCommand, Mode=OneTime}" />
@@ -42,6 +46,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height=".25*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -106,8 +111,29 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
-        <StackPanel Grid.Row="5" Grid.ColumnSpan="4">
+        <Label Grid.Row="5" Content="Import from file: "/>
+        <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" >
+            <Button  Width="130" HorizontalAlignment="Left" 
+                Command="{Binding ImportFileCommand, Mode=OneTime}">
+                <!--<Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource MultiValueConverter}">
+                        <Binding Path="Sms.Template" />
+                        <Binding Path="Sms.Message" />
+                    </MultiBinding>
+                </Button.CommandParameter>-->
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://application:,,,/Assets/Images/import-32.png" />
+                    <TextBlock Text="Import from Excel" />
+                </StackPanel>
+            </Button>
+            <Label Name="lblFileName">
+                <Label.Content>
+                    <Binding Converter="{StaticResource SingleConverter}" 
+                             UpdateSourceTrigger="PropertyChanged" Path="FileImport"/>
+                </Label.Content>
+            </Label>
+        </StackPanel>
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="4">
             <StackPanel.Resources>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
@@ -140,7 +166,7 @@
         </StackPanel>
 
         <DataGrid
-            Grid.Row="6"
+            Grid.Row="7"
             Grid.ColumnSpan="4"
             ItemsSource="{Binding Contacts, Mode=OneWay}"
             SelectedValue="{Binding Contact, Mode=TwoWay}">

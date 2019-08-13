@@ -101,7 +101,6 @@ namespace SmsBuddy.ViewModels
             ChildView = view;
             ChildViewModel = viewModel;
         }
-
         void Initialize()
         {
             _childViews = new Dictionary<string, FrameworkElement>();

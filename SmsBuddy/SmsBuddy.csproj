@@ -108,9 +108,6 @@
     <Compile Include="ViewModels\SmsGatewayViewModel.cs" />
     <Compile Include="ViewModels\SmsViewModel.cs" />
     <Compile Include="ViewModels\TemplateViewModel.cs" />
-    <Compile Include="Views\CircleProcessBar.xaml.cs">
-      <DependentUpon>CircleProcessBar.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ContactView.xaml.cs">
       <DependentUpon>ContactView.xaml</DependentUpon>
     </Compile>
@@ -165,10 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Assets\Styles\SharedStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CircleProcessBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
